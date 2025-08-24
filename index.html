@@ -2,10 +2,32 @@
 layout: default
 ---
 <h1>Моя стена ВКонтакте</h1>
+
+<div id="posts-container">
 {% for post in site.posts %}
-  <article class="post-card">
+  <article class="post-item" style="display: none;">
     <h2>{{ post.title }}</h2>
     <p class="date">{{ post.date | date: '%d %b %Y' }}</p>
     {{ post.content }}
   </article>
 {% endfor %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const posts = document.querySelectorAll('#posts-container .post-item');
+  let loaded = 0;
+  const batch = 10;
+  function showNext() {
+    for (let i = 0; i < batch && loaded < posts.length; i++, loaded++) {
+      posts[loaded].style.display = '';
+    }
+  }
+  showNext();
+  window.addEventListener('scroll', function() {
+    if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 100) {
+      showNext();
+    }
+  });
+});
+</script>
