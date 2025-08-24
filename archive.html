@@ -27,10 +27,23 @@ permalink: /archive.html
 </div>
 
 <script>
-  // если пришли с #y2024 — раскроем соответствующий блок
-  (function(){
-    const id = location.hash && location.hash.slice(1);
-    const d = id && document.getElementById(id);
-    if (d && d.tagName.toLowerCase()==='details') d.open = true;
+  (function () {
+    function openByHash() {
+      var id = location.hash && location.hash.slice(1);
+      if (!id) return;
+      var d = document.getElementById(id);
+      if (!d || d.tagName.toLowerCase() !== 'details') return;
+
+      // Закрываем другие годы, открываем нужный
+      document.querySelectorAll('details.year[open]').forEach(function(el){ el.removeAttribute('open'); });
+      d.setAttribute('open', '');  // управляем через атрибут open (см. спецификацию)
+      d.scrollIntoView({ block: 'start' });
+    }
+
+    // при первой загрузке по якорю
+    openByHash();
+
+    // и при последующих кликах по ссылкам вида #y2020 на этой же странице
+    window.addEventListener('hashchange', openByHash);
   })();
 </script>
