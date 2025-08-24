@@ -12,3 +12,4 @@ plugins:
 
 paginate: 10              # по 10 постов на страницу
 paginate_path: "/page:num/"
+ga4: "G-BTYZWTGBN6"
