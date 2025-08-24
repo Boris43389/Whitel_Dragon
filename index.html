@@ -1,33 +1,72 @@
 ---
 layout: default
+title: Лента
 ---
-<h1>Моя стена ВКонтакте</h1>
 
 <div id="posts-container">
-{% for post in site.posts %}
-  <article class="post-item" style="display: none;">
-    <h2>{{ post.title }}</h2>
-    <p class="date">{{ post.date | date: '%d %b %Y' }}</p>
-    {{ post.content }}
-  </article>
-{% endfor %}
+  {% for post in paginator.posts %}
+    <article class="post">
+      <h2><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h2>
+      <p class="date">{{ post.date | date: "%d %b %Y" }}</p>
+      {{ post.content }}
+    </article>
+  {% endfor %}
 </div>
 
+<nav class="pager">
+  {% if paginator.previous_page %}
+    <a class="newer-link" href="{{ paginator.previous_page_path | relative_url }}">Новее</a>
+  {% endif %}
+  {% if paginator.next_page %}
+    <a class="older-link" id="older-link" href="{{ paginator.next_page_path | relative_url }}">Старее</a>
+  {% endif %}
+</nav>
+
+<!-- Progressive enhancement: бесконечная прокрутка поверх обычной пагинации -->
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  const posts = document.querySelectorAll('#posts-container .post-item');
-  let loaded = 0;
-  const batch = 10;
-  function showNext() {
-    for (let i = 0; i < batch && loaded < posts.length; i++, loaded++) {
-      posts[loaded].style.display = '';
+(function(){
+  const olderLink = document.getElementById('older-link');
+  if (!olderLink) return; // нет следующей страницы — всё
+
+  let loading = false;
+  async function loadMoreIfNeeded() {
+    if (loading) return;
+    const nearBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 200;
+    if (!nearBottom) return;
+
+    const nextUrl = olderLink.getAttribute('href');
+    if (!nextUrl) return;
+    loading = true;
+
+    try {
+      const resp = await fetch(nextUrl, { credentials: 'same-origin' });
+      if (!resp.ok) throw new Error(resp.status);
+      const html = await resp.text();
+      const doc = new DOMParser().parseFromString(html, 'text/html');
+
+      // посты следующей страницы
+      const nextPosts = doc.querySelectorAll('#posts-container .post');
+      const container = document.getElementById('posts-container');
+      nextPosts.forEach(node => container.appendChild(node));
+
+      // обновляем ссылку "Старее" на ещё более старую страницу
+      const nextOlder = doc.getElementById('older-link');
+      if (nextOlder) {
+        olderLink.href = nextOlder.getAttribute('href');
+      } else {
+        // больше страниц нет
+        olderLink.remove();
+        window.removeEventListener('scroll', onScroll);
+      }
+    } catch (e) {
+      console.error('Infinite scroll error:', e);
+      window.removeEventListener('scroll', onScroll);
+    } finally {
+      loading = false;
     }
   }
-  showNext();
-  window.addEventListener('scroll', function() {
-    if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 100) {
-      showNext();
-    }
-  });
-});
+
+  function onScroll() { loadMoreIfNeeded(); }
+  window.addEventListener('scroll', onScroll, { passive: true });
+})();
 </script>
