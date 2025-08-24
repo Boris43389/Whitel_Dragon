@@ -36,3 +36,12 @@ footer {
   color: #999;
   font-size: 0.8rem;
 }
+.site-header .wrap {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.brand a { text-decoration: none; font-weight: 700; }
+
+.searchbox { margin-left: auto; min-width: 260px; }
