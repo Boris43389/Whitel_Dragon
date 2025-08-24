@@ -6,9 +6,9 @@ permalink: /archive.html
 
 <h1>Архив по годам</h1>
 
-{%- assign years = site.posts 
-   | group_by_exp: 'post', "post.date | date: '%Y'" 
-   | sort: 'name' | reverse -%}
+{%- assign years = site.posts
+   | group_by_exp:'post', "post.date | date: '%Y'"
+   | sort:'name' | reverse -%}
 
 <div class="archive-page">
   {%- for y in years -%}
@@ -27,14 +27,10 @@ permalink: /archive.html
 </div>
 
 <script>
-  // Если пришли с якорем (#y2024) — сразу раскрываем нужный год
-  (function () {
+  // если пришли с #y2024 — раскроем соответствующий блок
+  (function(){
     const id = location.hash && location.hash.slice(1);
-    if (!id) return;
-    const d = document.getElementById(id);
-    if (d && d.tagName.toLowerCase() === 'details') {
-      d.open = true;
-      d.scrollIntoView({block: 'start'});
-    }
+    const d = id && document.getElementById(id);
+    if (d && d.tagName.toLowerCase()==='details') d.open = true;
   })();
 </script>
