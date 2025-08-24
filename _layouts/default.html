@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{{ page.title | default: site.title }}</title>
 
-  {%- seo -%}
+  {% seo %}
 
-  <!-- Сетевые подсказки для GA и CSE -->
+  <!-- Network hints for GA & CSE -->
   <link rel="preconnect" href="https://www.googletagmanager.com">
   <link rel="dns-prefetch" href="//www.googletagmanager.com">
   <link rel="preconnect" href="https://cse.google.com">
@@ -15,17 +15,16 @@
 
   <link rel="stylesheet" href="{{ '/assets/css/styles.css' | relative_url }}">
 
-  {%- if jekyll.environment == "production" and site.ga4 -%}
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-BTYZWTGBN6"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-BTYZWTGBN6');
-</script>
-  {%- endif -%}
+  {% if jekyll.environment == "production" and site.ga4 %}
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id={{ site.ga4 }}"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){ dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', '{{ site.ga4 }}', { anonymize_ip: true, transport_type: 'beacon' });
+  </script>
+  {% endif %}
 </head>
 <body>
   <header class="site-header">
@@ -33,9 +32,6 @@
       <div class="brand">
         <a href="{{ site.baseurl }}/">{{ site.title }}</a>
       </div>
-
-
-      <!-- Поисковая строка Google (справа) -->
       <div class="searchbox">
         <div class="gcse-searchbox-only"
              data-resultsUrl="{{ site.baseurl }}/search.html"
@@ -45,69 +41,30 @@
     </div>
   </header>
 
-<div class="layout">
-  <aside class="sidebar">
-    <details class="archive" open>
-      <summary>Архив по годам</summary>
-      <ul class="year-list">
-        {%- assign years = site.posts 
-           | group_by_exp: "post", "post.date | date: '%Y'" 
-           | sort: "name" | reverse -%}
-        {%- for y in years -%}
-          <li>
-            <a href="{{ '/archive.html#y' | append: y.name | relative_url }}">
-              {{ y.name }} ({{ y.items | size }})
-            </a>
-          </li>
-        {%- endfor -%}
-      </ul>
-    </details>
-  </aside>
+  <div class="layout">
+    <aside class="sidebar">
+      <!-- нет атрибута open => свёрнуто по умолчанию -->
+      <details class="archive">
+        <summary>Архив по годам</summary>
+        <ul class="year-list">
+          {% assign years = site.posts
+             | group_by_exp:'post',"post.date | date: '%Y'"
+             | sort:'name' | reverse %}
+          {% for y in years %}
+            <li>
+              <a href="{{ '/archive.html#y' | append: y.name | relative_url }}">
+                {{ y.name }} ({{ y.items | size }})
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      </details>
+    </aside>
 
-  <main role="main">
-<div class="layout">
-  <aside class="sidebar">
-    <!-- БЕЗ атрибута open — значит свёрнуто по умолчанию -->
-    <details class="archive">
-      <summary>Архив по годам</summary>
-      <ul class="year-list">
-        {%- assign years = site.posts 
-           | group_by_exp: "post", "post.date | date: '%Y'" 
-           | sort: "name" | reverse -%}
-        {%- for y in years -%}
-          <li>
-            <a href="{{ '/archive.html#y' | append: y.name | relative_url }}">
-              {{ y.name }} ({{ y.items | size }})
-            </a>
-          </li>
-        {%- endfor -%}
-      </ul>
-    </details>
-  </aside>
-
-  <main role="main">
-    {{ content }}
-  </main>
-</div>
-
-<script>
-  // Если архив раскрыт — показываем левую колонку, иначе центрируем ленту
-  (function () {
-    const layout = document.querySelector('.layout');
-    const d = document.querySelector('.sidebar details.archive');
-    if (!layout || !d) return;
-    function update() {
-      if (d.open) layout.classList.add('side-open');
-      else layout.classList.remove('side-open');
-    }
-    d.addEventListener('toggle', update);
-    update(); // состояние при загрузке (по умолчанию свёрнуто)
-  })();
-</script>
-
-  </main>
-</div>
-
+    <main role="main">
+      {{ content }}
+    </main>
+  </div>
 
   <footer class="site-footer">
     <div class="wrap">
@@ -115,8 +72,23 @@
     </div>
   </footer>
 
-  {%- if site.google_cx -%}
+  {% if site.google_cx %}
   <script async src="https://cse.google.com/cse.js?cx={{ site.google_cx }}"></script>
-  {%- endif -%}
+  {% endif %}
+
+  <!-- Переключение сетки: одна колонка (по умолчанию) / две колонки при открытом архиве -->
+  <script>
+    (function () {
+      var layout = document.querySelector('.layout');
+      var d = document.querySelector('.sidebar details.archive');
+      if (!layout || !d) return;
+      function update() {
+        if (d.open) layout.classList.add('side-open');
+        else layout.classList.remove('side-open');
+      }
+      d.addEventListener('toggle', update);
+      update();
+    })();
+  </script>
 </body>
 </html>
