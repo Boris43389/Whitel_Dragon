@@ -1,8 +1,9 @@
 title: Мой архив ВКонтакте
-
 description: Личная стена
 url: https://boris43389.github.io
 baseurl: /Whitel_Dragon
+google_cx: "7379b4ee9cbbd4769"
+
 plugins:
-  - jekyll-feed
   - jekyll-sitemap
+  - jekyll-feed
