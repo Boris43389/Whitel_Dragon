@@ -1,0 +1,40 @@
+---
+layout: default
+title: Архив
+permalink: /archive.html
+---
+
+<h1>Архив по годам</h1>
+
+{%- assign years = site.posts 
+   | group_by_exp: 'post', "post.date | date: '%Y'" 
+   | sort: 'name' | reverse -%}
+
+<div class="archive-page">
+  {%- for y in years -%}
+    <details id="y{{ y.name }}" class="year">
+      <summary>{{ y.name }} ({{ y.items | size }})</summary>
+      <ul class="post-list">
+        {%- for post in y.items -%}
+          <li>
+            <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+            <span class="date">{{ post.date | date: "%d %b %Y" }}</span>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </details>
+  {%- endfor -%}
+</div>
+
+<script>
+  // Если пришли с якорем (#y2024) — сразу раскрываем нужный год
+  (function () {
+    const id = location.hash && location.hash.slice(1);
+    if (!id) return;
+    const d = document.getElementById(id);
+    if (d && d.tagName.toLowerCase() === 'details') {
+      d.open = true;
+      d.scrollIntoView({block: 'start'});
+    }
+  })();
+</script>
