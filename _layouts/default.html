@@ -65,7 +65,46 @@
   </aside>
 
   <main role="main">
+<div class="layout">
+  <aside class="sidebar">
+    <!-- БЕЗ атрибута open — значит свёрнуто по умолчанию -->
+    <details class="archive">
+      <summary>Архив по годам</summary>
+      <ul class="year-list">
+        {%- assign years = site.posts 
+           | group_by_exp: "post", "post.date | date: '%Y'" 
+           | sort: "name" | reverse -%}
+        {%- for y in years -%}
+          <li>
+            <a href="{{ '/archive.html#y' | append: y.name | relative_url }}">
+              {{ y.name }} ({{ y.items | size }})
+            </a>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </details>
+  </aside>
+
+  <main role="main">
     {{ content }}
+  </main>
+</div>
+
+<script>
+  // Если архив раскрыт — показываем левую колонку, иначе центрируем ленту
+  (function () {
+    const layout = document.querySelector('.layout');
+    const d = document.querySelector('.sidebar details.archive');
+    if (!layout || !d) return;
+    function update() {
+      if (d.open) layout.classList.add('side-open');
+      else layout.classList.remove('side-open');
+    }
+    d.addEventListener('toggle', update);
+    update(); // состояние при загрузке (по умолчанию свёрнуто)
+  })();
+</script>
+
   </main>
 </div>
 
