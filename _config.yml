@@ -3,6 +3,7 @@ description: Личная стена
 url: https://boris43389.github.io
 baseurl: /Whitel_Dragon
 google_cx: "7379b4ee9cbbd4769"
+ga4: "G-BTYZWTGBN6"
 
 plugins:
   - jekyll-sitemap
@@ -12,4 +13,3 @@ plugins:
 
 paginate: 10              # по 10 постов на страницу
 paginate_path: "/page:num/"
-ga4: "G-BTYZWTGBN6"
