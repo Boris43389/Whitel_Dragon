@@ -1,1 +1,44 @@
 
+/* ====== Шапка и общие ====== */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f2f3f5;
+  margin: 0;
+}
+.site-header { background:#3f51b5; color:#fff; }
+.site-header .wrap {
+  display:flex;
+  align-items:center;
+  gap:16px;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 12px 20px;
+}
+
+/* Бренд и ссылки в шапке */
+.brand a { color:#fff; text-decoration:none; font-weight:700; }
+
+/* Блок постов (как было) */
+main { padding:20px; }
+.post {
+  background:#fff;
+  border-radius:4px;
+  padding:16px;
+  margin:20px auto;
+  max-width:640px;
+  box-shadow:0 2px 4px rgba(0,0,0,.1);
+}
+.post h2 { margin-top:0; color:#3f51b5; }
+.post .date { font-size:.85rem; color:#666; margin-bottom:10px; }
+footer { text-align:center; padding:20px; color:#999; font-size:.8rem; }
+
+/* ====== Поисковый блок справа ====== */
+.searchbox { margin-left:auto; flex:0 1 420px; min-width:240px; }
+
+/* ====== Сброс стандартных стилей Google CSE в шапке ====== */
+.searchbox .gsc-control-cse { background:transparent; border:0; padding:0; }
+.searchbox form.gsc-search-box, 
+.searchbox table.gsc-search-box { margin:0; }
+.searchbox .gsc-search-box-tools .gsc-search-box .gsc-input { padding:0; }
+.searchbox input.gsc-input { box-shadow:none; }
+.searchbox .gsc-search-button-v2 { border-radius:20px; }
