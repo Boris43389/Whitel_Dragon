@@ -163,4 +163,33 @@ main { padding: 24px 20px; }
   .layout { grid-template-columns: 1fr; }
   .sidebar { position: static; }
 }
+/* Компоновка: одна колонка по умолчанию (центр), две колонки если архив открыт */
+.layout {
+  display: grid;
+  grid-template-columns: 1fr;      /* по умолчанию — одна колонка */
+  gap: 20px;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 16px 20px;
+}
+.layout.side-open {                 /* когда <details> открыт — показываем сайдбар */
+  grid-template-columns: 260px 1fr;
+}
+
+.sidebar { position: sticky; top: 72px; align-self: start; }
+.archive summary { cursor: pointer; font-weight: 700; }
+.year-list { list-style: none; margin: 8px 0 0; padding: 0; }
+.year-list li { margin: 6px 0; }
+.year-list a { text-decoration: none; }
+.year-list a:hover { text-decoration: underline; }
+
+/* Лента остаётся «карточками» по центру */
+main { padding: 0; }                      /* отступы уже есть у .layout */
+.post { max-width: 760px; margin: 20px auto; }
+
+/* Мобилки: всегда одна колонка */
+@media (max-width: 900px) {
+  .layout, .layout.side-open { grid-template-columns: 1fr; }
+  .sidebar { position: static; }
+}
 
