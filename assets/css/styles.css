@@ -1,49 +1,4 @@
-
-/* ====== Шапка и общие ====== */
-body {
-  font-family: Arial, sans-serif;
-  background-color: #f2f3f5;
-  margin: 0;
-}
-.site-header { background:#3f51b5; color:#fff; }
-.site-header .wrap {
-  display:flex;
-  align-items:center;
-  gap:16px;
-  max-width: 980px;
-  margin: 0 auto;
-  padding: 12px 20px;
-}
-
-/* Бренд и ссылки в шапке */
-.brand a { color:#fff; text-decoration:none; font-weight:700; }
-
-/* Блок постов (как было) */
-main { padding:20px; }
-.post {
-  background:#fff;
-  border-radius:4px;
-  padding:16px;
-  margin:20px auto;
-  max-width:640px;
-  box-shadow:0 2px 4px rgba(0,0,0,.1);
-}
-.post h2 { margin-top:0; color:#3f51b5; }
-.post .date { font-size:.85rem; color:#666; margin-bottom:10px; }
-footer { text-align:center; padding:20px; color:#999; font-size:.8rem; }
-
-/* ====== Поисковый блок справа ====== */
-.searchbox { margin-left:auto; flex:0 1 420px; min-width:240px; }
-
-/* ====== Сброс стандартных стилей Google CSE в шапке ====== */
-.searchbox .gsc-control-cse { background:transparent; border:0; padding:0; }
-.searchbox form.gsc-search-box, 
-.searchbox table.gsc-search-box { margin:0; }
-.searchbox .gsc-search-box-tools .gsc-search-box .gsc-input { padding:0; }
-.searchbox input.gsc-input { box-shadow:none; }
-.searchbox .gsc-search-button-v2 { border-radius:20px; }
-
-/* ====== Тема и типографика ====== */
+/* ====== Тема и базовые ====== */
 :root {
   --brand: #3f51b5;
   --bg: #f2f3f5;
@@ -53,7 +8,12 @@ footer { text-align:center; padding:20px; color:#999; font-size:.8rem; }
 }
 
 html { scroll-behavior: smooth; }
-body { color: var(--text); font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+}
 a { color: var(--brand); text-decoration: none; }
 a:hover { text-decoration: underline; }
 a:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
@@ -63,27 +23,47 @@ p { margin: .6em 0; }
 /* чтобы якорные ссылки не прятались под липкой шапкой */
 h2, h3, h4 { scroll-margin-top: 84px; }
 
-/* ====== Шапка (липкая) и навигация ====== */
-.site-header { position: sticky; top: 0; z-index: 1000; background: var(--brand); color: #fff; }
-.site-header .wrap { /* твои значения уже ок, просто страхуемся */
-  max-width: 980px; margin: 0 auto; padding: 12px 20px;
+/* ====== Шапка ====== */
+.site-header {
+  position: sticky; top: 0; z-index: 1000;
+  background: var(--brand); color: #fff;
 }
-.top-nav a { color: #cfe0ff; margin-left: 12px; font-size: .95rem; }
-.top-nav a:hover { color: #fff; }
+.site-header .wrap {
+  display:flex; align-items:center; gap:16px;
+  max-width:980px; margin:0 auto; padding:12px 20px;
+}
+.brand a { color:#fff; font-weight:700; text-decoration:none; }
 
-/* Поисковый бокс справа — адаптивнее */
-.searchbox { margin-left: auto; flex: 0 1 420px; min-width: 200px; }
+/* Поисковый бокс справа — компактный и адаптивный */
+.searchbox { margin-left:auto; flex:0 1 420px; min-width:200px; }
+.searchbox .gsc-control-cse { background:transparent; border:0; padding:0; }
+.searchbox form.gsc-search-box, .searchbox table.gsc-search-box { margin:0; }
+.searchbox .gsc-search-box-tools .gsc-search-box .gsc-input { padding:0; }
+.searchbox input.gsc-input { box-shadow:none; }
+.searchbox .gsc-search-button-v2 { border-radius:20px; }
 
-/* Сброс CSE в шапке (не даём раздуваться) */
-.searchbox .gsc-control-cse { background: transparent; border: 0; padding: 0; }
-.searchbox form.gsc-search-box, 
-.searchbox table.gsc-search-box { margin: 0; }
-.searchbox .gsc-search-box-tools .gsc-search-box .gsc-input { padding: 0; }
-.searchbox input.gsc-input { box-shadow: none; }
-.searchbox .gsc-search-button-v2 { border-radius: 20px; }
+/* ====== Макет: по умолчанию ОДНА колонка (лента по центру) ====== */
+.layout {
+  display:grid;
+  grid-template-columns: 1fr;        /* центрируем ленту по умолчанию */
+  gap:20px;
+  max-width:980px;
+  margin:0 auto;
+  padding:16px 20px;
+}
+/* Когда архив открыт — две колонки: 260px + контент */
+.layout.side-open { grid-template-columns: 260px 1fr; }
 
-/* ====== Контент и карточки постов ====== */
-main { padding: 24px 20px; }
+/* Левый сайдбар */
+.sidebar { position: sticky; top: 72px; align-self: start; }
+.archive summary { cursor:pointer; font-weight:700; }
+.year-list { list-style:none; padding:8px 0 0; margin:0; }
+.year-list li { margin:6px 0; }
+.year-list a { text-decoration:none; }
+.year-list a:hover { text-decoration:underline; }
+
+/* ====== Карточки постов ====== */
+main { padding: 0; }                 /* отступы даёт .layout */
 .post {
   background: var(--card);
   border-radius: 8px;
@@ -92,74 +72,46 @@ main { padding: 24px 20px; }
   max-width: 760px;
   box-shadow: 0 2px 6px rgba(0,0,0,.08);
 }
-.post h2 { margin-top: 0; color: var(--brand); }
-.post .date { font-size: .85rem; color: var(--muted); margin-bottom: 10px; }
+.post h2 { margin-top:0; color: var(--brand); }
+.post .date { font-size:.85rem; color: var(--muted); margin-bottom:10px; }
 
-/* Пейджер (для SEO-пагинации) */
-.pager { display: flex; gap: 12px; justify-content: center; margin: 24px 0; }
+/* Встроенные фото, которые подставляем скриптом */
+.post-photo { margin: 8px 0; }
+.post-photo img { display:block; max-width:100%; height:auto; border-radius:6px; }
+
+/* Пейджер (SEO-пагинация) */
+.pager { display:flex; gap:12px; justify-content:center; margin:24px 0; }
 .pager a {
-  background: #fff; border: 1px solid #e5e7eb; border-radius: 999px;
-  padding: 8px 14px; text-decoration: none;
+  background:#fff; border:1px solid #e5e7eb; border-radius:999px;
+  padding:8px 14px; text-decoration:none;
 }
-.pager a:hover { background: #f3f4f6; }
-
-/* Футер — в ту же сетку */
-.site-footer .wrap { max-width: 980px; margin: 0 auto; padding: 20px; color: #999; font-size: .9rem; }
+.pager a:hover { background:#f3f4f6; }
 
 /* ====== Страница результатов поиска (CSE) ====== */
 .gcse-searchresults-only,
 .gsc-results,
 .gsc-control-cse {
-  max-width: 980px;
-  margin: 16px auto;
-  background: transparent;
-  border: 0;
+  max-width:980px;
+  margin:16px auto;
+  background:transparent;
+  border:0;
 }
-.gsc-webResult.gsc-result { border: 0; padding: 12px 0; }
-.gsc-thumbnail-inside, .gsc-url-top { padding: 0; }
-.gsc-result .gs-title { font-size: 1.05rem; }
-.gsc-result .gs-snippet { color: #444; }
-.gsc-cursor-box { text-align: center; padding: 12px 0; }
+.gsc-webResult.gsc-result { border:0; padding:12px 0; }
+.gsc-thumbnail-inside, .gsc-url-top { padding:0; }
+.gsc-result .gs-title { font-size:1.05rem; }
+.gsc-result .gs-snippet { color:#444; }
+.gsc-cursor-box { text-align:center; padding:12px 0; }
 
-/* ====== Лоадер для бесконечной прокрутки (если добавишь) ====== */
-.infinite-loader { text-align:center; color:#666; padding:12px; }
+/* ====== Футер ====== */
+.site-footer .wrap { max-width:980px; margin:0 auto; padding:20px; color:#999; font-size:.9rem; }
 
 /* ====== Мобилки ====== */
-@media (max-width: 720px) {
-  .site-header .wrap { gap: 10px; padding: 10px 12px; }
-  .top-nav { display: none; }
-  .searchbox { flex: 1 1 auto; min-width: 140px; }
-  .post { margin: 12px auto; padding: 14px; max-width: 100%; }
-}
-
-/* Макет: колонка слева + контент справа */
-.layout {
-  display: grid;
-  grid-template-columns: 260px 1fr;
-  gap: 20px;
-  max-width: 980px;
-  margin: 0 auto;
-  padding: 16px 20px;
-}
-
-/* Левый сайдбар */
-.sidebar { position: sticky; top: 72px; align-self: start; }
-.archive summary { cursor: pointer; font-weight: 700; }
-.year-list { list-style: none; padding: 8px 0 0; margin: 0; }
-.year-list li { margin: 6px 0; }
-.year-list a { text-decoration: none; }
-.year-list a:hover { text-decoration: underline; }
-
-/* Страница архива */
-.archive-page { max-width: 980px; margin: 0 auto; }
-.year { margin: 10px 0 16px; }
-.year summary { font-weight: 700; cursor: pointer; }
-.post-list { list-style: none; padding-left: 0; margin: 8px 0 0; }
-.post-list li { margin: 6px 0; }
-.post-list .date { color: #666; font-size: .85rem; margin-left: 8px; }
-
-/* Адаптив */
 @media (max-width: 900px) {
-  .layout { grid-template-columns: 1fr; }
+  .layout, .layout.side-open { grid-template-columns: 1fr; } /* всегда одна колонка */
   .sidebar { position: static; }
+}
+@media (max-width: 720px) {
+  .site-header .wrap { gap:10px; padding:10px 12px; }
+  .searchbox { flex:1 1 auto; min-width:140px; }
+  .post { margin:12px auto; padding:14px; max-width:100%; }
 }
