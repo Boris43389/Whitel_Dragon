@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://boris43389.github.io/Whitel_Dragon/sitemap.xml
