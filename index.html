@@ -1,0 +1,11 @@
+---
+layout: default
+---
+<h1>Моя стена ВКонтакте</h1>
+{% for post in site.posts %}
+  <article class="post-card">
+    <h2>{{ post.title }}</h2>
+    <p class="date">{{ post.date | date: '%d %b %Y' }}</p>
+    {{ post.content }}
+  </article>
+{% endfor %}
