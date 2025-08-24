@@ -43,7 +43,7 @@
 
   <div class="layout">
     <aside class="sidebar">
-      <!-- нет open => свёрнуто по умолчанию -->
+      <!-- по умолчанию свёрнуто (нет open) -->
       <details class="archive">
         <summary>Архив по годам</summary>
         <ul class="year-list">
@@ -76,17 +76,20 @@
   <script async src="https://cse.google.com/cse.js?cx={{ site.google_cx }}"></script>
   {% endif %}
 
-  <!-- Вкл/выкл левой колонки при раскрытии архива -->
+  <!-- Переключаем сетку: 1 колонка по умолчанию, 2 — если левый details открыт -->
   <script>
     (function () {
       var layout = document.querySelector('.layout');
       var d = document.querySelector('.sidebar details.archive');
       if (!layout || !d) return;
 
-      // если случайно оставили open в разметке — уберём, чтобы по умолчанию было закрыто
+      function apply() {
+        layout.classList.toggle('side-open', d.open);
+      }
+
+      // гарантируем старт со свёрнутого состояния
       if (!d.open && d.hasAttribute('open')) d.removeAttribute('open');
 
-      function apply() { layout.classList.toggle('side-open', d.hasAttribute('open')); }
       d.addEventListener('toggle', apply);
       apply();
     })();
