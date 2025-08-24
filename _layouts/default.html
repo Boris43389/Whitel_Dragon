@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ page.title | default: site.title }}</title>
+  <link rel="stylesheet" href="{{ '/assets/css/styles.css' | relative_url }}">
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <div class="brand"><a href="{{ site.baseurl }}/">{{ site.title }}</a></div>
+      <div class="searchbox">
+        <div class="gcse-searchbox-only"
+          data-resultsUrl="{{ site.baseurl }}/search.html"
+          data-newWindow="false"
+          data-enableAutoComplete="true"></div>
+      </div>
+    </div>
+  </header>
+  <main>
+    {{ content }}
+  </main>
+  <footer>
+    <p>© {{ site.time | date: '%Y' }}</p>
+  </footer>
+  <script async src="https://cse.google.com/cse.js?cx={{ site.google_cx }}"></script>
+</body>
+</html>
