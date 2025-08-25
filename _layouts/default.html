@@ -16,14 +16,15 @@
   <link rel="stylesheet" href="{{ '/assets/css/styles.css' | relative_url }}">
 
   {% if jekyll.environment == "production" and site.ga4 %}
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id={{ site.ga4 }}"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){ dataLayer.push(arguments); }
-    gtag('js', new Date());
-    gtag('config', '{{ site.ga4 }}', { anonymize_ip: true, transport_type: 'beacon' });
-  </script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-KX2LDCQ32L"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-KX2LDCQ32L');
+</script>
   {% endif %}
 </head>
 <body>
