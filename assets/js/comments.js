@@ -1,7 +1,6 @@
 ---
 ---
 (() => {
-  // Куда смотреть архив (Liquid подставит baseurl)
   const CANDIDATE_BASES = [
     "{{ '/assets/comments/' | relative_url }}",
     "{{ '/assets/wall/' | relative_url }}",
@@ -12,17 +11,39 @@
   const urlsFor = (pid) =>
     CANDIDATE_BASES.map(b => b.replace(/\/+$/,'') + '/' + pid + '/' + COMMENTS_FILE);
 
+  // Достаём как bytes и ДЕКОДИРУЕМ сами (UTF-8 или windows-1251)
+  async function fetchHtmlSmart(url) {
+    const r = await fetch(url, { credentials: 'same-origin' });
+    if (!r.ok) return null;
+    const buf = await r.arrayBuffer();
+
+    // 1) Пытаемся определить win-1251 по <meta charset> в первых байтах
+    const head = new Uint8Array(buf.slice(0, 2048));
+    let ascii = '';
+    for (let i = 0; i < head.length; i++) ascii += (head[i] < 128 ? String.fromCharCode(head[i]) : ' ');
+    const hasWin1251Meta = /charset\s*=\s*windows-1251/i.test(ascii);
+
+    // 2) Декодируем: сначала UTF-8, а если видим � — пробуем win-1251
+    const decode = (enc) => new TextDecoder(enc).decode(buf);
+    let txt = hasWin1251Meta ? decode('windows-1251') : decode('utf-8');
+
+    if (!hasWin1251Meta && txt.includes('�')) {
+      // fallback на windows-1251
+      txt = decode('windows-1251');
+    }
+    return txt;
+  }
+
   async function fetchFirst(urls) {
     for (const u of urls) {
       try {
-        const r = await fetch(u, { credentials: 'same-origin' });
-        if (r.ok) return await r.text(); // HTML как строка
+        const html = await fetchHtmlSmart(u);
+        if (html) return html;
       } catch (_) {}
     }
     return null;
   }
 
-  // Кнопка-переключатель
   function createToggle(pid, label) {
     const btn = document.createElement('button');
     btn.className = 'vkcom-toggle';
@@ -38,61 +59,33 @@
     if (!pid || article.__vkcomMounted) return;
     article.__vkcomMounted = true;
 
-    // Панель с кнопкой
     let bar = article.querySelector('.vkcom-bar');
-    if (!bar) {
-      bar = document.createElement('div');
-      bar.className = 'vkcom-bar';
-      article.appendChild(bar);
-    }
+    if (!bar) { bar = document.createElement('div'); bar.className = 'vkcom-bar'; article.appendChild(bar); }
     const btn = createToggle(pid);
     bar.appendChild(btn);
 
-    // Контейнер контента комментариев
     let box = article.querySelector('.vkcom-box');
-    if (!box) {
-      box = document.createElement('div');
-      box.className = 'vkcom-box';
-      box.hidden = true;
-      article.appendChild(box);
-    }
+    if (!box) { box = document.createElement('div'); box.className = 'vkcom-box'; box.hidden = true; article.appendChild(box); }
 
     btn.addEventListener('click', async () => {
       const expanded = btn.getAttribute('aria-expanded') === 'true';
-      if (expanded) {
-        btn.setAttribute('aria-expanded', 'false');
-        box.hidden = true;
-        return;
-      }
+      if (expanded) { btn.setAttribute('aria-expanded', 'false'); box.hidden = true; return; }
+
       if (!box.__loaded) {
         btn.disabled = true; btn.classList.add('loading');
         const html = await fetchFirst(urlsFor(pid));
         btn.disabled = false; btn.classList.remove('loading');
 
-        if (!html) {
-          btn.textContent = 'Комментарии (нет архива)';
-          btn.setAttribute('aria-expanded', 'false');
-          return;
-        }
+        if (!html) { btn.textContent = 'Комментарии (нет архива)'; return; }
 
-        // Разбираем HTML архива
-        const parser = new DOMParser(); // парсим строку в Document (MDN) 
-        const doc = parser.parseFromString(html, 'text/html'); /* MDN */
-        // вычищаем лишнее
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');  // парсим уже ПРАВИЛЬНО декодированную строку
         doc.querySelectorAll('script, style, link, meta').forEach(n => n.remove());
 
-        // Пытаемся найти контейнер комментов в разных дампах
-        const candidates = [
-          '.wrap_page_content',   // как в типовом дампе
-          '.post__comments',      // альтернативные выгрузки
-          '.replies',             // иногда так
-          'body'                  // запасной вариант
-        ];
-        let wrap = null;
-        for (const sel of candidates) { wrap = doc.querySelector(sel); if (wrap) break; }
+        const containers = ['.wrap_page_content', '.post__comments', '.replies', 'body'];
+        let wrap = null; for (const sel of containers) { wrap = doc.querySelector(sel); if (wrap) break; }
         if (!wrap) wrap = doc.body;
 
-        // Элементы комментариев — часто .item, но подстрахуемся
         let items = wrap.querySelectorAll('.item');
         if (!items.length) items = wrap.querySelectorAll('.reply, .comment, li, div');
 
@@ -117,9 +110,8 @@
 
   function init() {
     bootScope(document);
-    // Поддержка бесконечной прокрутки — ловим новые посты
     const container = document.getElementById('posts-container') || document.body;
-    const obs = new MutationObserver(muts => {           // наблюдатель за DOM (MDN)
+    const obs = new MutationObserver(muts => {
       muts.forEach(m => m.addedNodes.forEach(n => {
         if (n.nodeType === 1) {
           if (n.matches?.('article.post[data-pid]')) mountForArticle(n);
@@ -127,7 +119,7 @@
         }
       }));
     });
-    obs.observe(container, { childList: true, subtree: true }); /* MDN */
+    obs.observe(container, { childList: true, subtree: true });
   }
 
   if (document.readyState === 'loading') {
