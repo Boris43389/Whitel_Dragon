@@ -1,7 +1,7 @@
 ---
 ---
 (() => {
-  // Где искать архив: можно оставить любые из этих трёх путей
+  // Куда смотреть архив (Liquid подставит baseurl)
   const CANDIDATE_BASES = [
     "{{ '/assets/comments/' | relative_url }}",
     "{{ '/assets/wall/' | relative_url }}",
@@ -16,17 +16,18 @@
     for (const u of urls) {
       try {
         const r = await fetch(u, { credentials: 'same-origin' });
-        if (r.ok) return await r.text();               // читаем текст архива
+        if (r.ok) return await r.text(); // HTML как строка
       } catch (_) {}
     }
     return null;
   }
 
-  function createToggle(pid) {
+  // Кнопка-переключатель
+  function createToggle(pid, label) {
     const btn = document.createElement('button');
     btn.className = 'vkcom-toggle';
     btn.type = 'button';
-    btn.textContent = 'Комментарии';
+    btn.textContent = label ?? 'Комментарии';
     btn.setAttribute('data-pid', pid);
     btn.setAttribute('aria-expanded', 'false');
     return btn;
@@ -37,6 +38,7 @@
     if (!pid || article.__vkcomMounted) return;
     article.__vkcomMounted = true;
 
+    // Панель с кнопкой
     let bar = article.querySelector('.vkcom-bar');
     if (!bar) {
       bar = document.createElement('div');
@@ -46,6 +48,7 @@
     const btn = createToggle(pid);
     bar.appendChild(btn);
 
+    // Контейнер контента комментариев
     let box = article.querySelector('.vkcom-box');
     if (!box) {
       box = document.createElement('div');
@@ -72,12 +75,27 @@
           return;
         }
 
-        const parser = new DOMParser(); // парсим HTML-строку в документ
-        const doc = parser.parseFromString(html, 'text/html');              /* MDN */ 
-        doc.querySelectorAll('script, style, link, meta').forEach(n => n.remove()); // на всякий случай
+        // Разбираем HTML архива
+        const parser = new DOMParser(); // парсим строку в Document (MDN) 
+        const doc = parser.parseFromString(html, 'text/html'); /* MDN */
+        // вычищаем лишнее
+        doc.querySelectorAll('script, style, link, meta').forEach(n => n.remove());
 
-        const wrap = doc.querySelector('.wrap_page_content') || doc.body;
-        const items = wrap.querySelectorAll('.item'); // в дампе VK каждый коммент — .item
+        // Пытаемся найти контейнер комментов в разных дампах
+        const candidates = [
+          '.wrap_page_content',   // как в типовом дампе
+          '.post__comments',      // альтернативные выгрузки
+          '.replies',             // иногда так
+          'body'                  // запасной вариант
+        ];
+        let wrap = null;
+        for (const sel of candidates) { wrap = doc.querySelector(sel); if (wrap) break; }
+        if (!wrap) wrap = doc.body;
+
+        // Элементы комментариев — часто .item, но подстрахуемся
+        let items = wrap.querySelectorAll('.item');
+        if (!items.length) items = wrap.querySelectorAll('.reply, .comment, li, div');
+
         const count = items.length || wrap.children.length;
 
         const root = document.createElement('div');
@@ -99,9 +117,9 @@
 
   function init() {
     bootScope(document);
-    // поддерживаем бесконечную прокрутку: отслеживаем появление новых постов
+    // Поддержка бесконечной прокрутки — ловим новые посты
     const container = document.getElementById('posts-container') || document.body;
-    const obs = new MutationObserver(muts => {                               /* MDN */
+    const obs = new MutationObserver(muts => {           // наблюдатель за DOM (MDN)
       muts.forEach(m => m.addedNodes.forEach(n => {
         if (n.nodeType === 1) {
           if (n.matches?.('article.post[data-pid]')) mountForArticle(n);
@@ -109,7 +127,7 @@
         }
       }));
     });
-    obs.observe(container, { childList: true, subtree: true });              /* MDN */
+    obs.observe(container, { childList: true, subtree: true }); /* MDN */
   }
 
   if (document.readyState === 'loading') {
