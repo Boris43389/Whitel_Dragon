@@ -3,7 +3,7 @@ description: Личная стена
 url: https://whiteldragon.github.io
 baseurl: /Whitel_Dragon
 google_cx: "7379b4ee9cbbd4769"
-ga4: "G-KX2LDCQ32L"
+ga4: "G-3L672NMKB9"
 
 plugins:
   - jekyll-sitemap
