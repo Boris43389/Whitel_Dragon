@@ -42,20 +42,26 @@ h2, h3, h4 { scroll-margin-top: 84px; }
 .searchbox input.gsc-input { box-shadow:none; }
 .searchbox .gsc-search-button-v2 { border-radius:20px; }
 
-/* ====== Макет: по умолчанию ОДНА колонка (лента по центру) ====== */
+/* ====== Макет ====== */
+/* По умолчанию ОДНА колонка (лента по центру) — сайдбар виден сверху и не съедает ширину */
 .layout {
   display:grid;
-  grid-template-columns: 1fr;             /* центр */
+  grid-template-columns: 1fr;
   gap:20px;
   max-width:980px;
   margin:0 auto;
   padding:16px 20px;
 }
-/* Сайдбар скрыт, пока архив закрыт */
-.sidebar { display:none; position: sticky; top: 72px; align-self: start; }
-/* Когда архив открыт — две колонки */
+/* Когда архив открыт — две колонки: 260px + контент */
 .layout.side-open { grid-template-columns: 260px minmax(0, 1fr); }
-.layout.side-open .sidebar { display:block; }
+
+/* Левый сайдбар всегда виден (сверху), чтобы можно было раскрыть архив */
+.sidebar { position: sticky; top: 72px; align-self: start; }
+.archive summary { cursor:pointer; font-weight:700; }
+.year-list { list-style:none; padding:8px 0 0; margin:0; }
+.year-list li { margin:6px 0; }
+.year-list a { text-decoration:none; }
+.year-list a:hover { text-decoration:underline; }
 
 /* ====== Карточки постов ====== */
 main { max-width: 760px; margin: 0 auto; padding: 0; }
