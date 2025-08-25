@@ -21,7 +21,7 @@ img, video { max-width: 100%; height: auto; border-radius: 6px; }
 h1, h2, h3 { line-height: 1.25; margin: 0 0 .6em; }
 p { margin: .6em 0; }
 /* якоря не прячутся под липкой шапкой */
-h2, h3, h4 { scroll-margin-top: 84px; }
+h2, h3, h4 { scroll-margin-top: 84px; } /* фикс для липкой шапки, см. идею scroll-margin-top. :contentReference[oaicite:1]{index=1} */
 
 /* ====== Шапка ====== */
 .site-header {
@@ -42,8 +42,9 @@ h2, h3, h4 { scroll-margin-top: 84px; }
 .searchbox input.gsc-input { box-shadow:none; }
 .searchbox .gsc-search-button-v2 { border-radius:20px; }
 
-/* ====== Макет ====== */
-/* По умолчанию ОДНА колонка (лента по центру) — сайдбар виден сверху и не съедает ширину */
+/* ====== Макет (контейнер) ====== */
+/* По умолчанию — одна колонка, лента по центру. Сайдбар показываем СВЕРХУ,
+   чтобы на узких и средних ширинах он не мешал чтению. */
 .layout {
   display:grid;
   grid-template-columns: 1fr;
@@ -52,16 +53,36 @@ h2, h3, h4 { scroll-margin-top: 84px; }
   margin:0 auto;
   padding:16px 20px;
 }
-/* Когда архив открыт — две колонки: 260px + контент */
+
+/* Когда архив раскрыт — включаем 2 колонки на средних ширинах */
 .layout.side-open { grid-template-columns: 260px minmax(0, 1fr); }
 
-/* Левый сайдбар всегда виден (сверху), чтобы можно было раскрыть архив */
+/* Сайдбар по умолчанию обычный, "прилипает" при прокрутке */
 .sidebar { position: sticky; top: 72px; align-self: start; }
 .archive summary { cursor:pointer; font-weight:700; }
 .year-list { list-style:none; padding:8px 0 0; margin:0; }
 .year-list li { margin:6px 0; }
 .year-list a { text-decoration:none; }
 .year-list a:hover { text-decoration:underline; }
+
+/* ====== ЛЕВАЯ РЕЙКА (широкие экраны) ======
+   На очень широких экранах выносим сайдбар в левую "гутту",
+   чтобы он не сдвигал/не опускал ленту. Контент остаётся строго по центру. */
+@media (min-width: 1360px) {
+  /* На больших экранах всегда рисуем одну центральную колонку,
+     а .sidebar превращаем в независимую "рейку" слева. */
+  .layout, .layout.side-open { grid-template-columns: 1fr; }
+
+  .sidebar {
+    position: fixed;                 /* независим от потока, не толкает контент */
+    top: 72px;                       /* отступ под шапку (липкая) */
+    left: calc(50vw - 660px);        /* 50vw - (380 контент-полуширина + 20 зазор + 260 ширина сайдбара) */
+    width: 260px;
+    max-height: calc(100vh - 96px);  /* чтобы влезал на экран */
+    overflow: auto;
+    z-index: 10;
+  }
+}
 
 /* ====== Карточки постов ====== */
 main { max-width: 760px; margin: 0 auto; padding: 0; }
@@ -75,6 +96,7 @@ main { max-width: 760px; margin: 0 auto; padding: 0; }
 }
 .post h2 { margin-top:0; color: var(--brand); }
 .post .date { font-size:.85rem; color: var(--muted); margin-bottom:10px; }
+
 /* Фото, подставленные скриптом */
 .post-photo { margin: 8px 0; }
 .post-photo img { display:block; max-width:100%; height:auto; border-radius:6px; }
@@ -108,7 +130,7 @@ main { max-width: 760px; margin: 0 auto; padding: 0; }
 /* Мобилки */
 @media (max-width: 900px) {
   .layout, .layout.side-open { grid-template-columns: 1fr; }
-  .sidebar { position: static; }
+  .sidebar { position: static; } /* обычный поток */
 }
 @media (max-width: 720px) {
   .site-header .wrap { gap:10px; padding:10px 12px; }
